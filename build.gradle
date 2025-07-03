@@ -1,0 +1,59 @@
+group = 'in.mcxiv.rmi'
+version = vRMI
+
+allprojects {
+    apply plugin: 'java-library'
+
+    [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+    // http://blog.joda.org/2014/02/turning-off-doclint-in-jdk-8-javadoc.html
+    if (JavaVersion.current().isJava8Compatible()) {
+        tasks.withType(Javadoc).tap { configureEach {/* https://discuss.gradle.org/t/passing-arguments-to-compiler-and-javadoc/1661 */ options.addStringOption('Xdoclint:none,-missing', '-quiet') } }
+    }
+
+    java {
+        withSourcesJar()
+        withJavadocJar()
+    }
+
+    compileJava {
+        sourceCompatibility = 8
+        targetCompatibility = 8
+        if (JavaVersion.current().isJava9Compatible()) options.release.set(8)
+    }
+
+    compileTestJava {
+        sourceCompatibility = 8
+        targetCompatibility = 8
+        if (JavaVersion.current().isJava9Compatible()) options.release.set(8)
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url 'https://s01.oss.sonatype.org' }
+        google()
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
+        maven { url 'https://jitpack.io' }
+    }
+
+    dependencies {
+        implementation "org.slf4j:slf4j-api:$vSLF4J"
+        implementation "com.github.crykn:kryonet:$vKryoNet"
+        runtimeOnly "org.slf4j:slf4j-simple:$vSLF4J"
+
+        testImplementation platform("org.junit:junit-bom:$vJUnit")
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+    }
+
+    test {
+        jvmArgs '--illegal-access=warn', '--add-opens=java.base/java.lang=ALL-UNNAMED'
+        useJUnitPlatform()
+    }
+
+    javadoc {
+        destinationDir = file('docs/apidocs')
+        options { links 'https://javadoc.io/doc/com.badlogicgames.gdx/gdx/latest/' }
+    }
+}
