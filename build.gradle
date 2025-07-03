@@ -57,3 +57,6 @@ allprojects {
         options { links 'https://javadoc.io/doc/com.badlogicgames.gdx/gdx/latest/' }
     }
 }
+
+apply plugin: 'maven-publish'
+
